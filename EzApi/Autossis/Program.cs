@@ -2,12 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Configuration;
-using System.Data.Entity;
-using System.Data.Entity.Infrastructure;
-using Microsoft.SqlServer.Dts.Runtime.Enumerators;
 using Microsoft.SqlServer.Dts.Runtime;
 using Microsoft.SqlServer.Dts.Runtime.Enumerators.ADO;
 
@@ -49,7 +44,6 @@ namespace ConsoleApp1
         }
         static EzPackage CreateBL(Package pk)
         {
-
             EzPackage ezPackage = new EzPackage();
             ezPackage.Name = pk.PackageName;
             ///添加变量
