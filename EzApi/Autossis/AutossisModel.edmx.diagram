@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+ <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <edmx:Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <!-- Diagram content (shape and connector positions) -->
+    <edmx:Diagrams>
+      <Diagram DiagramId="2fda839b308e42cebacca2ae4360e7f1" Name="Diagram1">
+        <EntityTypeShape EntityType="AutossisModel.Conmgr" Width="1.5" PointX="3" PointY="1.75" IsExpanded="true" />
+        <EntityTypeShape EntityType="AutossisModel.Package" Width="1.5" PointX="3" PointY="4.875" IsExpanded="true" />
+        <EntityTypeShape EntityType="AutossisModel.Project" Width="1.5" PointX="0.75" PointY="3.375" IsExpanded="true" />
+        <EntityTypeShape EntityType="AutossisModel.Task" Width="2" PointX="5.25" PointY="2.5" IsExpanded="true" />
+        <AssociationConnector Association="AutossisModel.FK__Conmgr__ProjectI__34C8D9D1" ManuallyRouted="false" />
+        <AssociationConnector Association="AutossisModel.FK__DataFlow__Source__2F10007B" ManuallyRouted="false" />
+        <AssociationConnector Association="AutossisModel.FK__DataFlow__Target__300424B4" ManuallyRouted="false" />
+        <AssociationConnector Association="AutossisModel.FK__DataFlow__Packag__30F848ED" ManuallyRouted="false" />
+        <AssociationConnector Association="AutossisModel.FK__Package__Project__286302EC" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="AutossisModel.PackageControl" Width="1.5" PointX="7.375" PointY="0.75" />
+        <EntityTypeShape EntityType="AutossisModel.TaskExecuteLog" Width="1.5" PointX="7.375" PointY="7" />
+        <EntityTypeShape EntityType="AutossisModel.TaskExecuteLogDetail" Width="1.5" PointX="9.625" PointY="6.875" />
+        <AssociationConnector Association="AutossisModel.FK__TaskExecu__Execu__6B24EA82" />
+      </Diagram>
+    </edmx:Diagrams>
+  </edmx:Designer>
+</edmx:Edmx>

@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1267
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EzAPI", "EzAPI.csproj", "{1BFEE854-8F82-49C7-A2A7-3E94A9DCE47F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Autossis", "Autossis\Autossis.csproj", "{95291E00-08AE-4FE2-AD53-6E3F15E2092D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1BFEE854-8F82-49C7-A2A7-3E94A9DCE47F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BFEE854-8F82-49C7-A2A7-3E94A9DCE47F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BFEE854-8F82-49C7-A2A7-3E94A9DCE47F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BFEE854-8F82-49C7-A2A7-3E94A9DCE47F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95291E00-08AE-4FE2-AD53-6E3F15E2092D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95291E00-08AE-4FE2-AD53-6E3F15E2092D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95291E00-08AE-4FE2-AD53-6E3F15E2092D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95291E00-08AE-4FE2-AD53-6E3F15E2092D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3805EC78-4E5C-4438-A6F1-691FD65259E8}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,474 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+    <Schema Namespace="AutossisModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Conmgr">
+          <Key>
+            <PropertyRef Name="ConmgrId" />
+          </Key>
+          <Property Name="ConmgrId" Type="int" Nullable="false" />
+          <Property Name="ConmgrName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ConnectionString" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="ProjectId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Package">
+          <Key>
+            <PropertyRef Name="PackageId" />
+          </Key>
+          <Property Name="PackageId" Type="int" Nullable="false" />
+          <Property Name="PackageName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="ProjectId" Type="int" Nullable="false" />
+        </EntityType>
+        <EntityType Name="PackageControl">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="int" Nullable="false" />
+          <Property Name="name" Type="nvarchar" MaxLength="200" />
+          <Property Name="ParentId" Type="int" />
+          <Property Name="ProjectId" Type="int" />
+        </EntityType>
+        <EntityType Name="Project">
+          <Key>
+            <PropertyRef Name="ProjectId" />
+          </Key>
+          <Property Name="ProjectId" Type="int" Nullable="false" />
+          <Property Name="ProjectName" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Task">
+          <Key>
+            <PropertyRef Name="TaskId" />
+          </Key>
+          <Property Name="TaskId" Type="int" Nullable="false" />
+          <Property Name="TaskName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="SourceConmgrId" Type="int" Nullable="false" />
+          <Property Name="TargetConmgrId" Type="int" Nullable="false" />
+          <Property Name="SourceTableName" Type="nvarchar" MaxLength="200" Nullable="false" />
+          <Property Name="TargetTableName" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="SqlCommand" Type="nvarchar(max)" Nullable="false" />
+          <Property Name="PackageId" Type="int" Nullable="false" />
+          <Property Name="TaskType" Type="nvarchar" MaxLength="50" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TaskExecuteLog">
+          <Key>
+            <PropertyRef Name="ExecuteId" />
+          </Key>
+          <Property Name="ExecuteId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ProjectId" Type="int" Nullable="false" />
+          <Property Name="PackageName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="Status" Type="nvarchar" MaxLength="20" Nullable="false" />
+          <Property Name="StartTime" Type="datetime" Nullable="false" />
+          <Property Name="EndTime" Type="datetime" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TaskExecuteLogDetail">
+          <Key>
+            <PropertyRef Name="DetailLogId" />
+          </Key>
+          <Property Name="DetailLogId" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="ExecuteId" Type="int" Nullable="false" />
+          <Property Name="TaskName" Type="nvarchar" MaxLength="100" Nullable="false" />
+          <Property Name="ExecuteDatetime" Type="datetime" Nullable="false" />
+          <Property Name="TimePeriod" Type="nvarchar" MaxLength="200" />
+        </EntityType>
+        <Association Name="FK__Conmgr__ProjectI__34C8D9D1">
+          <End Role="Project" Type="Self.Project" Multiplicity="1" />
+          <End Role="Conmgr" Type="Self.Conmgr" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Project">
+              <PropertyRef Name="ProjectId" />
+            </Principal>
+            <Dependent Role="Conmgr">
+              <PropertyRef Name="ProjectId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__DataFlow__Packag__30F848ED">
+          <End Role="Package" Type="Self.Package" Multiplicity="1" />
+          <End Role="Task" Type="Self.Task" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Package">
+              <PropertyRef Name="PackageId" />
+            </Principal>
+            <Dependent Role="Task">
+              <PropertyRef Name="PackageId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__DataFlow__Source__2F10007B">
+          <End Role="Conmgr" Type="Self.Conmgr" Multiplicity="1" />
+          <End Role="Task" Type="Self.Task" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Conmgr">
+              <PropertyRef Name="ConmgrId" />
+            </Principal>
+            <Dependent Role="Task">
+              <PropertyRef Name="SourceConmgrId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__DataFlow__Target__300424B4">
+          <End Role="Conmgr" Type="Self.Conmgr" Multiplicity="1" />
+          <End Role="Task" Type="Self.Task" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Conmgr">
+              <PropertyRef Name="ConmgrId" />
+            </Principal>
+            <Dependent Role="Task">
+              <PropertyRef Name="TargetConmgrId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Package__Project__286302EC">
+          <End Role="Project" Type="Self.Project" Multiplicity="1" />
+          <End Role="Package" Type="Self.Package" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Project">
+              <PropertyRef Name="ProjectId" />
+            </Principal>
+            <Dependent Role="Package">
+              <PropertyRef Name="ProjectId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__TaskExecu__Execu__74AE54BC">
+          <End Role="TaskExecuteLog" Type="Self.TaskExecuteLog" Multiplicity="1" />
+          <End Role="TaskExecuteLogDetail" Type="Self.TaskExecuteLogDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TaskExecuteLog">
+              <PropertyRef Name="ExecuteId" />
+            </Principal>
+            <Dependent Role="TaskExecuteLogDetail">
+              <PropertyRef Name="ExecuteId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="AutossisModelStoreContainer">
+          <EntitySet Name="Conmgr" EntityType="Self.Conmgr" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Package" EntityType="Self.Package" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="PackageControl" EntityType="Self.PackageControl" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Project" EntityType="Self.Project" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Task" EntityType="Self.Task" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TaskExecuteLog" EntityType="Self.TaskExecuteLog" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="TaskExecuteLogDetail" EntityType="Self.TaskExecuteLogDetail" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK__Conmgr__ProjectI__34C8D9D1" Association="Self.FK__Conmgr__ProjectI__34C8D9D1">
+            <End Role="Project" EntitySet="Project" />
+            <End Role="Conmgr" EntitySet="Conmgr" />
+          </AssociationSet>
+          <AssociationSet Name="FK__DataFlow__Packag__30F848ED" Association="Self.FK__DataFlow__Packag__30F848ED">
+            <End Role="Package" EntitySet="Package" />
+            <End Role="Task" EntitySet="Task" />
+          </AssociationSet>
+          <AssociationSet Name="FK__DataFlow__Source__2F10007B" Association="Self.FK__DataFlow__Source__2F10007B">
+            <End Role="Conmgr" EntitySet="Conmgr" />
+            <End Role="Task" EntitySet="Task" />
+          </AssociationSet>
+          <AssociationSet Name="FK__DataFlow__Target__300424B4" Association="Self.FK__DataFlow__Target__300424B4">
+            <End Role="Conmgr" EntitySet="Conmgr" />
+            <End Role="Task" EntitySet="Task" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Package__Project__286302EC" Association="Self.FK__Package__Project__286302EC">
+            <End Role="Project" EntitySet="Project" />
+            <End Role="Package" EntitySet="Package" />
+          </AssociationSet>
+          <AssociationSet Name="FK__TaskExecu__Execu__74AE54BC" Association="Self.FK__TaskExecu__Execu__74AE54BC">
+            <End Role="TaskExecuteLog" EntitySet="TaskExecuteLog" />
+            <End Role="TaskExecuteLogDetail" EntitySet="TaskExecuteLogDetail" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema></edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="AutossisModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="Conmgr">
+          <Key>
+            <PropertyRef Name="ConmgrId" />
+          </Key>
+          <Property Name="ConmgrId" Type="Int32" Nullable="false" />
+          <Property Name="ConmgrName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ConnectionString" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ProjectId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Project" Relationship="Self.FK__Conmgr__ProjectI__34C8D9D1" FromRole="Conmgr" ToRole="Project" />
+          <NavigationProperty Name="Task" Relationship="Self.FK__DataFlow__Source__2F10007B" FromRole="Conmgr" ToRole="Task" />
+          <NavigationProperty Name="Task1" Relationship="Self.FK__DataFlow__Target__300424B4" FromRole="Conmgr" ToRole="Task" />
+        </EntityType>
+        <EntityType Name="Package">
+          <Key>
+            <PropertyRef Name="PackageId" />
+          </Key>
+          <Property Name="PackageId" Type="Int32" Nullable="false" />
+          <Property Name="PackageName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="ProjectId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="Task" Relationship="Self.FK__DataFlow__Packag__30F848ED" FromRole="Package" ToRole="Task" />
+          <NavigationProperty Name="Project" Relationship="Self.FK__Package__Project__286302EC" FromRole="Package" ToRole="Project" />
+        </EntityType>
+        <EntityType Name="Project">
+          <Key>
+            <PropertyRef Name="ProjectId" />
+          </Key>
+          <Property Name="ProjectId" Type="Int32" Nullable="false" />
+          <Property Name="ProjectName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Conmgr" Relationship="Self.FK__Conmgr__ProjectI__34C8D9D1" FromRole="Project" ToRole="Conmgr" />
+          <NavigationProperty Name="Package" Relationship="Self.FK__Package__Project__286302EC" FromRole="Project" ToRole="Package" />
+        </EntityType>
+        <EntityType Name="Task">
+          <Key>
+            <PropertyRef Name="TaskId" />
+          </Key>
+          <Property Name="TaskId" Type="Int32" Nullable="false" />
+          <Property Name="TaskName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="SourceConmgrId" Type="Int32" Nullable="false" />
+          <Property Name="TargetConmgrId" Type="Int32" Nullable="false" />
+          <Property Name="SourceTableName" Type="String" MaxLength="200" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="TargetTableName" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="SqlCommand" Type="String" MaxLength="Max" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="PackageId" Type="Int32" Nullable="false" />
+          <Property Name="TaskType" Type="String" MaxLength="50" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="Conmgr" Relationship="Self.FK__DataFlow__Source__2F10007B" FromRole="Task" ToRole="Conmgr" />
+          <NavigationProperty Name="Conmgr1" Relationship="Self.FK__DataFlow__Target__300424B4" FromRole="Task" ToRole="Conmgr" />
+          <NavigationProperty Name="Package" Relationship="Self.FK__DataFlow__Packag__30F848ED" FromRole="Task" ToRole="Package" />
+        </EntityType>
+        <Association Name="FK__Conmgr__ProjectI__34C8D9D1">
+          <End Role="Project" Type="Self.Project" Multiplicity="1" />
+          <End Role="Conmgr" Type="Self.Conmgr" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Project">
+              <PropertyRef Name="ProjectId" />
+            </Principal>
+            <Dependent Role="Conmgr">
+              <PropertyRef Name="ProjectId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__DataFlow__Source__2F10007B">
+          <End Role="Conmgr" Type="Self.Conmgr" Multiplicity="1" />
+          <End Role="Task" Type="Self.Task" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Conmgr">
+              <PropertyRef Name="ConmgrId" />
+            </Principal>
+            <Dependent Role="Task">
+              <PropertyRef Name="SourceConmgrId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__DataFlow__Target__300424B4">
+          <End Role="Conmgr" Type="Self.Conmgr" Multiplicity="1" />
+          <End Role="Task" Type="Self.Task" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Conmgr">
+              <PropertyRef Name="ConmgrId" />
+            </Principal>
+            <Dependent Role="Task">
+              <PropertyRef Name="TargetConmgrId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__DataFlow__Packag__30F848ED">
+          <End Role="Package" Type="Self.Package" Multiplicity="1" />
+          <End Role="Task" Type="Self.Task" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Package">
+              <PropertyRef Name="PackageId" />
+            </Principal>
+            <Dependent Role="Task">
+              <PropertyRef Name="PackageId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK__Package__Project__286302EC">
+          <End Role="Project" Type="Self.Project" Multiplicity="1" />
+          <End Role="Package" Type="Self.Package" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Project">
+              <PropertyRef Name="ProjectId" />
+            </Principal>
+            <Dependent Role="Package">
+              <PropertyRef Name="ProjectId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="AutossisEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="Conmgr" EntityType="Self.Conmgr" />
+          <EntitySet Name="Package" EntityType="Self.Package" />
+          <EntitySet Name="Project" EntityType="Self.Project" />
+          <EntitySet Name="Task" EntityType="Self.Task" />
+          <AssociationSet Name="FK__Conmgr__ProjectI__34C8D9D1" Association="Self.FK__Conmgr__ProjectI__34C8D9D1">
+            <End Role="Project" EntitySet="Project" />
+            <End Role="Conmgr" EntitySet="Conmgr" />
+          </AssociationSet>
+          <AssociationSet Name="FK__DataFlow__Source__2F10007B" Association="Self.FK__DataFlow__Source__2F10007B">
+            <End Role="Conmgr" EntitySet="Conmgr" />
+            <End Role="Task" EntitySet="Task" />
+          </AssociationSet>
+          <AssociationSet Name="FK__DataFlow__Target__300424B4" Association="Self.FK__DataFlow__Target__300424B4">
+            <End Role="Conmgr" EntitySet="Conmgr" />
+            <End Role="Task" EntitySet="Task" />
+          </AssociationSet>
+          <AssociationSet Name="FK__DataFlow__Packag__30F848ED" Association="Self.FK__DataFlow__Packag__30F848ED">
+            <End Role="Package" EntitySet="Package" />
+            <End Role="Task" EntitySet="Task" />
+          </AssociationSet>
+          <AssociationSet Name="FK__Package__Project__286302EC" Association="Self.FK__Package__Project__286302EC">
+            <End Role="Project" EntitySet="Project" />
+            <End Role="Package" EntitySet="Package" />
+          </AssociationSet>
+          <EntitySet Name="PackageControl" EntityType="AutossisModel.PackageControl" />
+          <EntitySet Name="TaskExecuteLog" EntityType="AutossisModel.TaskExecuteLog" />
+          <EntitySet Name="TaskExecuteLogDetail" EntityType="AutossisModel.TaskExecuteLogDetail" />
+          <AssociationSet Name="FK__TaskExecu__Execu__6B24EA82" Association="AutossisModel.FK__TaskExecu__Execu__6B24EA82">
+            <End Role="TaskExecuteLog" EntitySet="TaskExecuteLog" />
+            <End Role="TaskExecuteLogDetail" EntitySet="TaskExecuteLogDetail" />
+          </AssociationSet>
+        </EntityContainer>
+        <EntityType Name="PackageControl">
+          <Key>
+            <PropertyRef Name="id" />
+          </Key>
+          <Property Name="id" Type="Int32" Nullable="false" />
+          <Property Name="name" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+          <Property Name="ParentId" Type="Int32" />
+          <Property Name="ProjectId" Type="Int32" />
+        </EntityType>
+        <EntityType Name="TaskExecuteLog">
+          <Key>
+            <PropertyRef Name="ExecuteId" />
+          </Key>
+          <Property Name="ExecuteId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="PackageName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="Status" Type="String" MaxLength="20" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="TaskExecuteLogDetail" Relationship="AutossisModel.FK__TaskExecu__Execu__6B24EA82" FromRole="TaskExecuteLog" ToRole="TaskExecuteLogDetail" />
+          <Property Name="StartTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="EndTime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="ProjectId" Type="Int32" Nullable="false" />
+        </EntityType>
+        <EntityType Name="TaskExecuteLogDetail">
+          <Key>
+            <PropertyRef Name="DetailLogId" />
+          </Key>
+          <Property Name="DetailLogId" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="ExecuteId" Type="Int32" Nullable="false" />
+          <Property Name="TaskName" Type="String" MaxLength="100" FixedLength="false" Unicode="true" Nullable="false" />
+          <NavigationProperty Name="TaskExecuteLog" Relationship="AutossisModel.FK__TaskExecu__Execu__6B24EA82" FromRole="TaskExecuteLogDetail" ToRole="TaskExecuteLog" />
+          <Property Name="ExecuteDatetime" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="TimePeriod" Type="String" MaxLength="200" FixedLength="false" Unicode="true" />
+        </EntityType>
+        <Association Name="FK__TaskExecu__Execu__6B24EA82">
+          <End Type="AutossisModel.TaskExecuteLog" Role="TaskExecuteLog" Multiplicity="1" />
+          <End Type="AutossisModel.TaskExecuteLogDetail" Role="TaskExecuteLogDetail" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="TaskExecuteLog">
+              <PropertyRef Name="ExecuteId" />
+            </Principal>
+            <Dependent Role="TaskExecuteLogDetail">
+              <PropertyRef Name="ExecuteId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="AutossisModelStoreContainer" CdmEntityContainer="AutossisEntities">
+          <EntitySetMapping Name="Conmgr">
+            <EntityTypeMapping TypeName="AutossisModel.Conmgr">
+              <MappingFragment StoreEntitySet="Conmgr">
+                <ScalarProperty Name="ConmgrId" ColumnName="ConmgrId" />
+                <ScalarProperty Name="ConmgrName" ColumnName="ConmgrName" />
+                <ScalarProperty Name="ConnectionString" ColumnName="ConnectionString" />
+                <ScalarProperty Name="ProjectId" ColumnName="ProjectId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Package">
+            <EntityTypeMapping TypeName="AutossisModel.Package">
+              <MappingFragment StoreEntitySet="Package">
+                <ScalarProperty Name="PackageId" ColumnName="PackageId" />
+                <ScalarProperty Name="PackageName" ColumnName="PackageName" />
+                <ScalarProperty Name="ProjectId" ColumnName="ProjectId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Project">
+            <EntityTypeMapping TypeName="AutossisModel.Project">
+              <MappingFragment StoreEntitySet="Project">
+                <ScalarProperty Name="ProjectId" ColumnName="ProjectId" />
+                <ScalarProperty Name="ProjectName" ColumnName="ProjectName" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Task">
+            <EntityTypeMapping TypeName="AutossisModel.Task">
+              <MappingFragment StoreEntitySet="Task">
+                <ScalarProperty Name="TaskId" ColumnName="TaskId" />
+                <ScalarProperty Name="TaskName" ColumnName="TaskName" />
+                <ScalarProperty Name="SourceConmgrId" ColumnName="SourceConmgrId" />
+                <ScalarProperty Name="TargetConmgrId" ColumnName="TargetConmgrId" />
+                <ScalarProperty Name="SourceTableName" ColumnName="SourceTableName" />
+                <ScalarProperty Name="TargetTableName" ColumnName="TargetTableName" />
+                <ScalarProperty Name="SqlCommand" ColumnName="SqlCommand" />
+                <ScalarProperty Name="PackageId" ColumnName="PackageId" />
+                <ScalarProperty Name="TaskType" ColumnName="TaskType" />
+                </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="PackageControl">
+            <EntityTypeMapping TypeName="AutossisModel.PackageControl">
+              <MappingFragment StoreEntitySet="PackageControl">
+                <ScalarProperty Name="ProjectId" ColumnName="ProjectId" />
+                <ScalarProperty Name="ParentId" ColumnName="ParentId" />
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="id" ColumnName="id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TaskExecuteLog">
+            <EntityTypeMapping TypeName="AutossisModel.TaskExecuteLog">
+              <MappingFragment StoreEntitySet="TaskExecuteLog">
+                <ScalarProperty Name="ProjectId" ColumnName="ProjectId" />
+                <ScalarProperty Name="EndTime" ColumnName="EndTime" />
+                <ScalarProperty Name="StartTime" ColumnName="StartTime" />
+                <ScalarProperty Name="Status" ColumnName="Status" />
+                <ScalarProperty Name="PackageName" ColumnName="PackageName" />
+                <ScalarProperty Name="ExecuteId" ColumnName="ExecuteId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="TaskExecuteLogDetail">
+            <EntityTypeMapping TypeName="AutossisModel.TaskExecuteLogDetail">
+              <MappingFragment StoreEntitySet="TaskExecuteLogDetail">
+                <ScalarProperty Name="TimePeriod" ColumnName="TimePeriod" />
+                <ScalarProperty Name="ExecuteDatetime" ColumnName="ExecuteDatetime" />
+                <ScalarProperty Name="TaskName" ColumnName="TaskName" />
+                <ScalarProperty Name="ExecuteId" ColumnName="ExecuteId" />
+                <ScalarProperty Name="DetailLogId" ColumnName="DetailLogId" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="false" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="无" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>
