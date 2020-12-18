@@ -80,6 +80,7 @@
     <Compile Include="Conmgr.cs">
       <DependentUpon>AutossisModel.tt</DependentUpon>
     </Compile>
+    <Compile Include="ICreatePackage.cs" />
     <Compile Include="Package.cs">
       <DependentUpon>AutossisModel.tt</DependentUpon>
     </Compile>
