@@ -32,10 +32,10 @@ namespace ConsoleApp1
                 #endregion
             }
             var Packages = db.Package.Where(p => p.ProjectId ==pj.ProjectId);
+            ICreatePackage icp = new CreatePackageFactory(db, ezOleDbConnectionManagers).getICreatePackage(ConfigurationManager.AppSettings.Get("ProjectType"));
+            PackageFactory pf = new PackageFactory(icp);
             foreach (var package in Packages)
             {
-                ICreatePackage icp = new CreatePackageFactory(db, ezOleDbConnectionManagers).getICreatePackage(ConfigurationManager.AppSettings.Get("ProjectType"));
-                PackageFactory pf = new PackageFactory(icp);
                 ez.AddPackage(pf.Create(package));
                 Console.WriteLine(package.PackageName+" 生成成功。");
             }
