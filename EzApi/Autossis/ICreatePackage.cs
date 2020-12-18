@@ -1,31 +1,29 @@
 ﻿using Microsoft.SqlServer.Dts.Runtime;
 using Microsoft.SqlServer.Dts.Runtime.Enumerators.ADO;
 using Microsoft.SqlServer.SSIS.EzAPI;
-using System;
 using System.Collections.Generic;
+using System.Composition;
 using System.Linq;
 
 namespace ConsoleApp1
 {
     public interface ICreatePackage
     {
+        Dictionary<int, EzOleDbConnectionManager> ezOleDbConnectionManagers { get; set; }
         EzPackage Create(Package pk);
     }
 
+
+    [Export("Replenish", typeof(ICreatePackage))]
     public class CreateReplenishPackage : ICreatePackage
     {
-        AutossisEntities dbContext;
-        Dictionary<int, EzOleDbConnectionManager> ezOleDbConnectionManagers;
-        public CreateReplenishPackage(AutossisEntities DbContext, Dictionary<int, EzOleDbConnectionManager> oledbManage)
-        {
-            dbContext = DbContext;
-            ezOleDbConnectionManagers = oledbManage;
-        }
-
+        public Dictionary<int, EzOleDbConnectionManager> ezOleDbConnectionManagers { get; set; }
         public EzPackage Create(Package pk)
         {
-            EzPackage ezPackage = new EzPackage();
-            ezPackage.Name = pk.PackageName;
+            EzPackage ezPackage = new EzPackage
+            {
+                Name = pk.PackageName
+            };
             ///添加变量
             ezPackage.Variables.Add("ExecuteId", false, "User", "0");
             ezPackage.Variables.Add("TimeList", false, "User", null);
@@ -33,9 +31,11 @@ namespace ConsoleApp1
             ezPackage.Variables.Add("EndTime", false, "User", "");
             //变量集合
             Variables Variables = ezPackage.Variables;
-
-            var tasks = dbContext.Task.Where(p => p.PackageId == pk.PackageId);
-
+            IList<Task> tasks;
+            using (AutossisEntities db = new AutossisEntities())
+            {
+                tasks = db.Task.Where(p => p.PackageId == pk.PackageId).ToList();
+            }
             #region 第0步:GetTimeList
             Task GetTimeListTask = tasks.Where(p => p.TaskName.StartsWith("GetTimeList")).First();
             EzExecSqlTask GetTimeList = createEzExecSqlTask(ezPackage, GetTimeListTask, null);
@@ -74,7 +74,7 @@ namespace ConsoleApp1
 
             #region 第3.2.1步：load data
             List<Task> dataflowTasks = tasks.Where(p => p.TaskName.StartsWith("load data") && p.SourceTableName.TrimEnd() != "").ToList();
-            foreach (var dft in dataflowTasks)
+            foreach (Task dft in dataflowTasks)
             {
                 createEzDataFlow(ezContainer, dft, null, Variables);
             }
@@ -108,7 +108,7 @@ namespace ConsoleApp1
         /// <param name="task"></param>
         /// <param name="PreviousComponent"></param>
         /// <returns></returns>
-        EzExecSqlTask createEzExecSqlTask(EzContainer parent, Task task, EzExecutable PreviousComponent)
+        private EzExecSqlTask createEzExecSqlTask(EzContainer parent, Task task, EzExecutable PreviousComponent)
         {
             EzExecSqlTask ezExecSqlTask = new EzExecSqlTask(parent);
             if (PreviousComponent != null)
@@ -129,7 +129,7 @@ namespace ConsoleApp1
         /// <param name="task"></param>
         /// <param name="PreviousComponent"></param>
         /// <returns></returns>
-        EzDataFlow createEzDataFlow(EzContainer parent, Task task, EzExecutable PreviousComponent, Variables Variables)
+        private EzDataFlow createEzDataFlow(EzContainer parent, Task task, EzExecutable PreviousComponent, Variables Variables)
         {
             //Adding a data flow task
             EzDataFlow dataflow = new EzDataFlow(parent);
@@ -137,21 +137,23 @@ namespace ConsoleApp1
             {
                 dataflow.AttachTo(PreviousComponent);
             }
-            dataflow.Name = task.TaskName + Guid.NewGuid().ToString("N");
-            EzOleDbSource source = new EzOleDbSource(dataflow);
-            source.Name = task.TaskName;
-            //source.SqlCommand =string.Format("exec [dbo].[{0}] ",task.SourceTableName);
-            source.SqlCommand = task.SourceTableName;
+            dataflow.Name = task.TaskName + "_" + task.TaskId;
+            EzOleDbSource source = new EzOleDbSource(dataflow)
+            {
+                Name = task.TaskName,
+                //source.SqlCommand =string.Format("exec [dbo].[{0}] ",task.SourceTableName);
+                SqlCommand = task.SourceTableName,
 
 
-            source.Connection = ezOleDbConnectionManagers[task.SourceConmgrId];
-            //source.Table = task.SourceTableName;
-            source.AccessMode = AccessMode.AM_SQLCOMMAND;
+                Connection = ezOleDbConnectionManagers[task.SourceConmgrId],
+                //source.Table = task.SourceTableName;
+                AccessMode = AccessMode.AM_SQLCOMMAND
+            };
 
             string start_guid = "";
             string end_guid = "";
 
-            foreach (var x in Variables)
+            foreach (Variable x in Variables)
             {
 
                 if (x.Namespace == "User")
@@ -179,31 +181,34 @@ namespace ConsoleApp1
             }
             source.SetComponentProperty("ParameterMapping", "\"@StartTime:Input\"," + start_guid + ";\"@EndTime:Input\"," + end_guid + ";");
             //Adding an OLE DB Destination
-            EzOleDbDestination destination = new EzOleDbDestination(dataflow);
-            destination.Name = task.TargetTableName;
-            destination.Connection = ezOleDbConnectionManagers[task.TargetConmgrId];
-            destination.AccessMode = AccessMode.AM_OPENROWSET_FASTLOAD;
-            destination.Table = task.TargetTableName;
+            EzOleDbDestination destination = new EzOleDbDestination(dataflow)
+            {
+                Name = task.TargetTableName,
+                Connection = ezOleDbConnectionManagers[task.TargetConmgrId],
+                AccessMode = AccessMode.AM_OPENROWSET_FASTLOAD,
+                Table = task.TargetTableName
+            };
 
             //Linking source and destination
             destination.AttachTo(source);
             destination.LinkAllInputsToOutputs();
             return dataflow;
         }
+
         /// <summary>
         /// 创建 序列容器
         /// </summary>
         /// <param name="parent"></param>
         /// <param name="PreviousComponent"></param>
         /// <returns></returns>
-        EzSequence CreateEzSequence(EzContainer parent, EzExecutable PreviousComponent)
+        private EzSequence CreateEzSequence(EzContainer parent, EzExecutable PreviousComponent)
         {
             EzSequence ezContainer = new EzSequence(parent);
             if (PreviousComponent != null)
             {
                 ezContainer.AttachTo(PreviousComponent);
             }
-            ezContainer.Name = Guid.NewGuid().ToString("N");
+            ezContainer.Name = "Data Flows";
             return ezContainer;
         }
 
@@ -213,15 +218,16 @@ namespace ConsoleApp1
         /// <param name="parent"></param>
         /// <param name="PreviousComponent"></param>
         /// <returns></returns>
-        EzForEachLoop CreateEzForEachLoop(EzContainer parent, EzExecutable PreviousComponent)
+        private EzForEachLoop CreateEzForEachLoop(EzContainer parent, EzExecutable PreviousComponent)
         {
-            EzForEachLoop ForEachContainer = new EzForEachLoop(parent);
-            ForEachContainer.Name = "bl data by month";
+            EzForEachLoop ForEachContainer = new EzForEachLoop(parent)
+            {
+                Name = "Replenish data by month"
+            };
             if (PreviousComponent != null)
             {
                 ForEachContainer.AttachTo(PreviousComponent);
             }
-            ForEachContainer.Name = Guid.NewGuid().ToString("N");
             ForEachContainer.Initialize(ForEachEnumeratorType.ForEachADOEnumerator);
             //ForEachContainer.ForEachEnumerator = ForEachEnumeratorType.ForEachADOEnumerator;
 
@@ -247,38 +253,11 @@ namespace ConsoleApp1
 
     }
 
-    public class CreatePackageFactory
-    {
 
-        AutossisEntities dbContext;
-        Dictionary<int, EzOleDbConnectionManager> ezOleDbConnectionManagers;
-
-        public CreatePackageFactory(AutossisEntities DbContext, Dictionary<int, EzOleDbConnectionManager> EzOleDbConnectionManagers)
-        {
-            dbContext = DbContext;
-            ezOleDbConnectionManagers = EzOleDbConnectionManagers;
-        }
-
-        public ICreatePackage getICreatePackage(string ProjectType)
-        {
-            switch (ProjectType)
-            {
-                case "Inc":
-                    return new CreateIncPackage();
-                case "Full":
-                    return new CreateFullPackage();
-                default:
-                    return new CreateReplenishPackage(dbContext, ezOleDbConnectionManagers);
-            }
-        }
-
-    }
-
-
-
+    [Export("Full", typeof(ICreatePackage))]
     public class CreateFullPackage : ICreatePackage
     {
-
+        public Dictionary<int, EzOleDbConnectionManager> ezOleDbConnectionManagers { get; set; }
         public EzPackage Create(Package pk)
         {
             return null;
@@ -286,29 +265,13 @@ namespace ConsoleApp1
 
     }
 
+    [Export("Inc", typeof(ICreatePackage))]
     public class CreateIncPackage : ICreatePackage
     {
-
+        public Dictionary<int, EzOleDbConnectionManager> ezOleDbConnectionManagers { get; set; }
         public EzPackage Create(Package pk)
         {
             return null;
-        }
-
-    }
-
-    public class PackageFactory
-    {
-
-        public ICreatePackage ff;
-
-        public PackageFactory(ICreatePackage fb)
-        {
-            ff = fb;
-        }
-
-        public EzPackage Create(Package pk)
-        {
-            return ff.Create(pk);
         }
 
     }
