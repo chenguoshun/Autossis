@@ -65,7 +65,7 @@ namespace ConsoleApp1
         /// <param name="ParentInfo"></param>
         private static void JobControl(Project Pj, PackageControl ParentInfo)
         {
-            IQueryable<PackageControl> childs;
+            List<PackageControl> childs;
             using (AutossisEntities db = new AutossisEntities())
             {
                 if (ParentInfo == null)
@@ -73,7 +73,7 @@ namespace ConsoleApp1
 
                     ParentInfo = db.PackageControl.Where(p => p.ProjectId == Pj.ProjectId && p.ParentId == null).First();
                 }
-                childs = db.PackageControl.Where(p => p.ParentId == ParentInfo.id);
+                childs = db.PackageControl.Where(p => p.ParentId == ParentInfo.id).ToList();
 
             }
 
