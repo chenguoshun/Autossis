@@ -1,10 +1,8 @@
 ﻿using Microsoft.SqlServer.SSIS.EzAPI;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Configuration;
-using Microsoft.SqlServer.Dts.Runtime;
-using Microsoft.SqlServer.Dts.Runtime.Enumerators.ADO;
+using System.Linq;
 
 namespace ConsoleApp1
 {
