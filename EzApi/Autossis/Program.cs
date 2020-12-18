@@ -93,7 +93,11 @@ namespace ConsoleApp1
                 }
             }
         }
-
+        /// <summary>
+        /// 获取Oledb项目连接管理器
+        /// </summary>
+        /// <param name="Conmgrs"></param>
+        /// <returns></returns>
         private static Dictionary<int, EzOleDbConnectionManager> getOledbConnectionManagers(List<Conmgr> Conmgrs)
         {
             Dictionary<int, EzOleDbConnectionManager> cms = new Dictionary<int, EzOleDbConnectionManager>();
